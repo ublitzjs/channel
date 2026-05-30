@@ -1,9 +1,9 @@
-![μBlitz.js](./logo.png)
-<br/>
-
 # @ublitzjs/channel - REALLY fastest niche event emitter alternative
 
 A blazing-fast, lightweight Pub/Sub event channel designed as a high-performance, type-safe alternative to Node's standard `EventEmitter`. 
+
+![μBlitz.js](./logo.png)
+<br/>
 
 Built for performance-critical applications, it minimizes creation overhead and leverages an optimized swap-and-pop strategy to achieve **$O(1)$ unsubscription times** for unique listeners.
 
@@ -12,14 +12,18 @@ Built for performance-critical applications, it minimizes creation overhead and 
 - **Ultra Low Overhead:** Faster instantiation and publication execution than standard event emitters.
 - **$O(1)$ Removals:** True constant-time unsubscriptions via `sub_unique` and `unsub_unique`.
 - **Self-Cleaning Listeners:** Easily create single-use (`once`) events mid-execution without breaking the dispatch loop.
+- **No Dependencies:** Works in NodeJS, Bun and a Web browser
 - **TypeScript-first** 
 - **Prebuilt for ESM and CJS**
 - **Thoroughly tested**
-- **No Dependencies**
 
 > ⚠️ **Important Note on Ordering:** To maintain extreme speed during deletions, the execution order of the remaining listeners is **not preserved** when a subscriber is removed.
 
 ---
+
+## Benchmarks
+- [NodeJS](./nodejs_benchmark.md)
+- [Bun](./bunjs_benchmark.md)
 
 ## Installation
 
@@ -27,8 +31,8 @@ Built for performance-critical applications, it minimizes creation overhead and 
 bun add @ublitzjs/channel 
 ```
 
-# Quick Start
-## Using a single Channel
+## Quick Start
+### Using a single Channel
 
 If you use EventEmitter for only one event, use **Channel** directly
 ```typescript
@@ -79,7 +83,7 @@ loginChannel.sub(({ username }) => {
 loginChannel.pub({ id: 42, username: 'Neo' });
 ```
 
-Core Guide & Performance Optimization
+## Core Guide & Performance Optimization
 1. Standard Subscription (sub / unsub)
 
 Best used for listeners shared across multiple distinct channels or when you intend to subscribe the exact same function reference multiple times to a single channel.
