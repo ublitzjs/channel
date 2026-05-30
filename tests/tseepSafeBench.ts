@@ -1,6 +1,6 @@
 /**This comparison will stay here. For some reason "tinybench" lets "tseep safe" win ALL tests, while here in manually written benchmark channel is FASTER*/
 import {EventEmitter} from "tseep/lib/ee-safe.js"
-import {Channel} from "@ublitzjs/core/channel"
+import {Channel} from "@ublitzjs/channel"
 var emitter = new EventEmitter;
 var channel = new Channel;
 function b() {}
