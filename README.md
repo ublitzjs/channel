@@ -2,7 +2,7 @@
 
 A blazing-fast, lightweight Pub/Sub event channel designed as a high-performance, type-safe alternative to Node's standard `EventEmitter`. 
 
-![μBlitz.js](./logo.png)
+![μBlitz.js](https://github.com/ublitzjs/core/blob/main/logo.png)
 <br/>
 
 Built for performance-critical applications, it minimizes creation overhead and leverages an optimized swap-and-pop strategy to achieve **$O(1)$ unsubscription times** for unique listeners.
