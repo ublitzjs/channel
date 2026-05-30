@@ -23,3 +23,5 @@ jobs:
         run: bun run trick-tsd && bun run build
       - name: run test
         run: bun run test
+      - name: benchmark
+        run: bun run bench
