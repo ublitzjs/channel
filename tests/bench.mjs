@@ -4,6 +4,13 @@ import { EventEmitter as Node_ee } from "node:events"
 import { CozyEvent } from "cozyevent"
 import { Channel } from "@ublitzjs/channel"
 var closure = (cb)=>cb()
+function prettifyLog(task) {
+  return {
+    task: task.name,
+    'ops/s': Math.round(task.result.throughput.mean),
+    Samples: task.result.latency.samplesCount,
+  }
+}
 closure(() => {
   console.log("1000 listeners add/remove individually")
   var tseep = new Tseep_ee();
@@ -13,7 +20,7 @@ closure(() => {
   var my = new Channel()
   var cozy = new CozyEvent()
 
-  var bench = new Bench({ time: 1000 });
+  var bench = new Bench({ time: 2000 });
   var arr = new Array(1000);
   for (var i = 0; i < arr.length; i++) {
     arr[i] = () => { }
@@ -90,7 +97,7 @@ closure(() => {
     }
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("adding 10 listeners + remove individually")
@@ -98,7 +105,7 @@ closure(() => {
   var node = new Node_ee();
   var my = new Channel()
   var cozy = new CozyEvent()
-  var bench = new Bench({ time: 1000 });
+  var bench = new Bench({ time: 2000 });
   var arr = new Array(10);
   for (var i = 0; i < arr.length; i++) {
     arr[i] = () => { }
@@ -175,7 +182,7 @@ closure(() => {
     }
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("creation time as of empty class")
@@ -187,7 +194,7 @@ closure(() => {
     new Channel;
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("adding 10 listeners + removeAllListeners")
@@ -222,7 +229,7 @@ closure(() => {
     cozy.removeAllListeners('foo')
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("'unrealistic' constant 'emit' with no add/remove")
@@ -258,7 +265,7 @@ closure(() => {
     cozy.emit("foo", "SOME LARGE DATA")
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("3 constant listeners, add/remove 1 listener each '5 emit calls'")
@@ -316,7 +323,7 @@ closure(() => {
     cozy.off("foo", dynamic)
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("'once' listeners (for Channel - just .clear())")
@@ -352,7 +359,7 @@ closure(() => {
     cozy.emit('foo')
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })
 closure(() => {
   console.log("mixed creation + listeners + emit")
@@ -404,5 +411,5 @@ closure(() => {
     cozy.emit("foo")
   })
   bench.runSync()
-  console.table(bench.table())
+  console.table(bench.table(prettifyLog))
 })

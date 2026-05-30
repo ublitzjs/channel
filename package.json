@@ -37,7 +37,8 @@
     "build:types": "tsc -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:esm && npm run build:cjs",
     "test": "tsd && vitest run tests/index.test.ts --coverage",
-    "bench": "node tests/bench.mjs"
+    "bench:node": "node tests/bench.mjs",
+    "bench:bun": "bun tests/bench.mjs"
   },
   "tsd": {
     "directory": "tests"
