@@ -336,17 +336,20 @@ closure(() => {
   for (var i = 0; i < arr.length; i++) {
     arr[i] = () => { }
   }
+  var myArr = new Array(10);
+  for (var i = 0; i < arr.length; i++) {
+    myArr[i] = () => { my.unsubCurrent() }
+  }
   bench.add("tseep", () => {
     for (var i = 0; i < arr.length; i++) {
       tseep.once('foo', arr[i]);
     }
     tseep.emit('foo')
   }).add("channel", () => {
-    for (var i = 0; i < arr.length; i++) {
-      my.sub(arr[i]);
+    for (var i = 0; i < myArr.length; i++) {
+      my.sub(myArr[i]);
     }
     my.pub(undefined)
-    my.clear()
   }).add("node:events", () => {
     for (var i = 0; i < arr.length; i++) {
       node.once('foo', arr[i]);
