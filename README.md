@@ -1,17 +1,129 @@
-# Basic architecture for creating typescript libraries 
-You can fork it as a base for your library or borrow some techniques.  
-## Source
-You can write .ts (and index.ts as main) files in "src", build them with "bun run build" to dist/esm, dist/cjs, dist/types. package.json is configured so that only "dist" directory is published, so src/tests/tsconfigs.
-The support is for ESM and CJS. But to build cjs, you have to build esm first.
-## Testing
-New update brought a change to how testing is initialized. "tests/abstraction.ts" gives you a function, which lets you easily configure all files you need to test in 4 ways (ESM, CJS, Minified ESM and CJS). In this repo write init at tests/index.test.ts (look at code which is there already).
-### Built source
-You can write all tests in "tests/all.ts" or make it import other tests.  
-You should not export tests with default export.  
-Tests can be either usign "vitest" or "tsd" in the same file.  
-Exported functions run 4 times overall (dist/esm, dist/cjs and 2 explained below).  
-If you want to import your package with the name you used in package.json then you have to trick tsd. Literally. Just run "bun run trick-tsd" and you are good to go (plus if you use "exports" field you need to use "typeVersions" field as well in package.json. Look at current repo's code there)
-### Bundled and minified source
-ESBuild minifies and bundles ESM and CJS that you have built into local "tmp" directory. It is automated and configured within "tests/abstraction.ts". Whatever your module exports preserves names so tests can be run against "all.ts" (again, this is automated)
-## Github CI/CD
-Each commit to the main branch triggers tests and each "new release" triggers publishing to npm. For this to work you should configure your repo according to "NPM trusted publishing"
+![μBlitz.js](./logo.png)
+<br/>
+
+# @ublitzjs/channel - REALLY fastest niche event emitter alternative
+
+A blazing-fast, lightweight Pub/Sub event channel designed as a high-performance, type-safe alternative to Node's standard `EventEmitter`. 
+
+Built for performance-critical applications, it minimizes creation overhead and leverages an optimized swap-and-pop strategy to achieve **$O(1)$ unsubscription times** for unique listeners.
+
+## Features
+
+- **Ultra Low Overhead:** Faster instantiation and publication execution than standard event emitters.
+- **$O(1)$ Removals:** True constant-time unsubscriptions via `sub_unique` and `unsub_unique`.
+- **Self-Cleaning Listeners:** Easily create single-use (`once`) events mid-execution without breaking the dispatch loop.
+- **TypeScript-first** 
+- **Prebuilt for ESM and CJS**
+- **Thoroughly tested**
+- **No Dependencies**
+
+> ⚠️ **Important Note on Ordering:** To maintain extreme speed during deletions, the execution order of the remaining listeners is **not preserved** when a subscriber is removed.
+
+---
+
+## Installation
+
+```bash
+bun add @ublitzjs/channel 
+```
+
+# Quick Start
+## Using a single Channel
+
+If you use EventEmitter for only one event, use **Channel** directly
+```typescript
+
+import { Channel } from '@ublitzjs/channel';
+
+// Define your payload type
+type LogMessage = `[Log] ${string}`;
+
+// Create a channel with a payload type
+const logChannel = new Channel<LogMessage>();
+
+// Subscribe to updates (like emitter.on)
+const onLog = (msg: LogMessage) => console.log(`Received: ${msg}`);
+logChannel.sub(onLog);
+
+// Publish data (like emitter.emit)
+logChannel.pub("[Log] User logged in successfully");
+
+// Unsubscribe (like emitter.off)
+logChannel.unsub(onLog);
+```
+
+## Using a ChannelMap (EventEmitter Style)
+
+For multiple lazily created centralised events use **ChannelMap**
+```typescript
+
+import { ChannelMap } from '@ublitzjs/channel';
+
+// 1. Define your Event Registry Map
+interface AppEvents {
+  'user:login': { id: number; username: string };
+  'user:logout': { id: number };
+}
+
+// 2. Instantiate the Emitter Map
+const emitter = new ChannelMap<AppEvents>();
+
+// 3. Get the specific channel and subscribe
+const loginChannel = emitter.on('user:login');
+
+loginChannel.sub(({ username }) => {
+  console.log(`Welcome back, ${username}!`);
+});
+
+// 4. Emit/Publish an event
+loginChannel.pub({ id: 42, username: 'Neo' });
+```
+
+Core Guide & Performance Optimization
+1. Standard Subscription (sub / unsub)
+
+Best used for listeners shared across multiple distinct channels or when you intend to subscribe the exact same function reference multiple times to a single channel.
+
+    Unsubscription Cost: O(N) linear scan from the end of the array.
+
+```typescript
+channel.sub(myListener);
+channel.unsub(myListener);
+```
+
+2. High-Performance Unique Subscription (sub_unique / unsub_unique)
+
+Highly Recommended for hot code paths. By ensuring a listener is unique to this channel, the channel injects an internal tracking ID to achieve instant unsubscription.
+
+    Unsubscription Cost: O(1) constant time.
+
+```typescript
+// The listener reference must be unique to this channel instance
+const onDataReceived = (data) => processData(data);
+
+channel.sub_unique(onDataReceived);
+
+// Instantly removed in O(1) time complexity
+channel.unsub_unique(onDataReceived); 
+```
+
+    🔴 Warning: Do not manually modify or rely on the id property appended to your callback function in your external application logic.
+
+3. Single-Use / Self-Cleaning Listeners (unsubCurrent)
+
+Perfect for implementing once() behavior. If listener is It is advised to call it at the top of a listener
+```TypeScript
+
+channel.sub((data) => {
+  // Safely unsubscribes the callback while the channel is mid-publication
+  channel.unsubCurrent();
+  console.log("This will only run for the very first event dispatch:", data);
+});
+
+channel.sub(async (data)=>{
+    channel.unsubCurrent();
+    await doSomething(data);
+
+    /* Do not call unsubCurrent() here */
+})
+```

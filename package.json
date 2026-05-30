@@ -1,29 +1,19 @@
 {
-  "name": "mylib",
-  "files": [
-    "dist"
-  ],
-  "tsd": {
-    "directory": "tests"
-  },
+  "name": "@ublitzjs/channel",
+  "version": "1.0.0",
+  "types": "./dist/types/index.d.ts",
+  "files": ["dist", "LICENSE"],
   "typesVersions": {
     "*": {
-      ".": ["./dist/types/index.d.ts"],
-      "sub": ["./dist/types/sub.d.ts"]
+      ".": ["./dist/types/index.d.ts"]
     }
   },
-  "version": "0.0.0",
-  "types": "./dist/types/index.d.ts",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "require": "./dist/cjs/index.js",
       "import": "./dist/esm/index.js"
-    },
-    "./sub": {
-      "types": "./dist/types/sub.d.ts",
-      "require": "./dist/cjs/sub.js",
-      "import": "./dist/esm/sub.js"
     }
   },
   "publishConfig": {
@@ -33,30 +23,44 @@
     "@babel/cli": "^7.28.6",
     "@babel/core": "^7.29.0",
     "@babel/plugin-transform-modules-commonjs": "^7.28.6",
-    "@types/node": "^25.2.1",
+    "@types/node": "^25.9.1",
     "@vitest/coverage-v8": "4.0.18",
-    "esbuild": "^0.27.3",
+    "cozyevent": "^1.3.3",
+    "esbuild": "^0.25.12",
+    "tinybench": "^6.0.0",
     "tsd": "^0.33.0",
-    "typescript": "^5.9.3",
+    "tseep": "^1.3.1",
     "vitest": "^4.0.8"
   },
   "scripts": {
-    "pack": "npm pack",
+    "trick-tsd": "bun link && bun link @ublitzjs/channel",
     "build:esm": "tsc -p tsconfig.esm.json && echo '{\"type\": \"module\"}' > dist/esm/package.json",
     "build:cjs": "babel dist/esm --out-dir dist/cjs",
     "build:types": "tsc -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:esm && npm run build:cjs",
-    "trick-tsd": "bun link && bun link mylib",
-    "test": "tsd && vitest --coverage run tests/index.test.ts"
+    "test": "tsd && vitest run tests/index.test.ts --coverage",
+    "bench": "node tests/bench.mjs"
+  },
+  "tsd": {
+    "directory": "tests"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/"
+    "url": "https://github.com/ublitzjs/channel.git"
   },
   "bugs": {
-    "url": "https://github.com/",
-    "email": "@gmail.com"
+    "url": "https://github.com/ublitzjs/channel/issues",
+    "email": "diril656@gmail.com"
   },
-  "homepage": "https://github.com/",
-  "keywords": []
+  "homepage": "https://github.com/ublitzjs/channel#readme",
+  "keywords": [
+    "ublitzjs",
+    "typescript",
+    "development",
+    "pub/sub",
+    "fastest event emitter",
+    "O(1)",
+    "asynchronous code",
+    "µBlitz.js"
+  ]
 }
